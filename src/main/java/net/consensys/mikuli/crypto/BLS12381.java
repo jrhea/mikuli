@@ -3,6 +3,7 @@ package net.consensys.mikuli.crypto;
 import java.util.List;
 import org.apache.milagro.amcl.BLS381.BIG;
 import org.apache.milagro.amcl.BLS381.ECP;
+import org.apache.milagro.amcl.BLS381.ECP2;
 import org.apache.milagro.amcl.BLS381.MPIN;
 import net.consensys.mikuli.crypto.group.AtePairing;
 import net.consensys.mikuli.crypto.group.G1Point;
@@ -19,11 +20,11 @@ public final class BLS12381 {
    * @return The SignatureAndPublicKey, not null
    */
   public static SignatureAndPublicKey sign(KeyPair keyPair, byte[] message) {
-    G1Point hashInGroup1 = hashFunction(message);
+    G2Point hashInGroup2 = hashFunction(message);
     /*
-     * The signature is hash point in G1 multiplied by the private key.
+     * The signature is hash point in G2 multiplied by the private key.
      */
-    G1Point sig = keyPair.privateKey().sign(hashInGroup1);
+    G2Point sig = keyPair.privateKey().sign(hashInGroup2);
     return new SignatureAndPublicKey(new Signature(sig), keyPair.publicKey());
   }
 
@@ -37,11 +38,11 @@ public final class BLS12381 {
    * @return True if the verification is successful.
    */
   public static boolean verify(PublicKey publicKey, Signature signature, byte[] message) {
-    G2Point g2Generator = SystemParameters.g2Generator;
+    G1Point g1Generator = SystemParameters.g1Generator;
 
-    G1Point hashInGroup1 = hashFunction(message);
-    GTPoint e1 = AtePairing.pair(hashInGroup1, publicKey.g2Point());
-    GTPoint e2 = AtePairing.pair(signature.g1Point(), g2Generator);
+    G2Point hashInGroup2 = hashFunction(message);
+    GTPoint e1 = AtePairing.pair(publicKey.g1Point(), hashInGroup2);
+    GTPoint e2 = AtePairing.pair(g1Generator, signature.g2Point());
 
     return e1.equals(e2);
   }
@@ -101,8 +102,8 @@ public final class BLS12381 {
     }
   }
 
-  private static G1Point hashFunction(byte[] message) {
+  private static G2Point hashFunction(byte[] message) {
     byte[] hashByte = MPIN.HASH_ID(ECP.SHA256, message, BIG.MODBYTES);
-    return new G1Point(ECP.mapit(hashByte));
+    return new G2Point(ECP2.mapit(hashByte));
   }
 }

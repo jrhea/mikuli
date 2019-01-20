@@ -1,6 +1,6 @@
 package net.consensys.mikuli.crypto;
 
-import net.consensys.mikuli.crypto.group.G1Point;
+import net.consensys.mikuli.crypto.group.G2Point;
 import net.consensys.mikuli.crypto.group.Scalar;
 
 public final class PrivateKey {
@@ -14,7 +14,7 @@ public final class PrivateKey {
     this.scalarValue = value;
   }
 
-  protected G1Point sign(G1Point message) {
+  protected G2Point sign(G2Point message) {
     return message.mul(scalarValue);
   }
 }

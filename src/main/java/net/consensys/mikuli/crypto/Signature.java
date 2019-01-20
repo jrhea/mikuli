@@ -1,11 +1,11 @@
 package net.consensys.mikuli.crypto;
 
-import net.consensys.mikuli.crypto.group.G1Point;
+import net.consensys.mikuli.crypto.group.G2Point;
 
 public final class Signature {
-  private final G1Point point;
+  private final G2Point point;
 
-  Signature(G1Point point) {
+  Signature(G2Point point) {
     if (point == null) {
       throw new NullPointerException("Signature was not properly initialized");
     }
@@ -31,7 +31,7 @@ public final class Signature {
   }
 
   public static Signature decode(byte[] bytes) {
-    G1Point point = G1Point.fromBytes(bytes);
+    G2Point point = G2Point.fromBytes(bytes);
     return new Signature(point);
   }
 
@@ -60,7 +60,7 @@ public final class Signature {
     return true;
   }
 
-  G1Point g1Point() {
+  G2Point g2Point() {
     return point;
   }
 }
